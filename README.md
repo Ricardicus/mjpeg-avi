@@ -9,9 +9,9 @@ Run the script 'create-avi.sh' as follows:
 ./create-avi.sh <path where the jpgs reside> <widthxheight of the jpgs> <the number of jpgs> 
 #Example
 Take a couple of photos and place them in a directory called 'jpgs'. 
-type the following commands:
+Then type the following commands in the terminal:
 
-cd 'this-director'
+cd 'this-directory'
 
 make 
 
