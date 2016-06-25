@@ -8,7 +8,9 @@ Change executable permissions of the script 'create-avi.sh' and compile the C so
 Run the script 'create-avi.sh' as follows:
 ./create-avi.sh <path where the jpgs reside> <widthxheight of the jpgs> <the number of jpgs> 
 #Example
-Take a couple of photos and place them in a directory called 'jpgs'. 
+Take a couple of photos and place them in a directory called for example 'jpgs'. 
+Check their dimensions, let's say 1080 pixels in width and 720 pixels in height. 
+Say we want to display 1 frame per second in the video. 
 Then type the following commands in the terminal:
 
 cd 'this-directory'
