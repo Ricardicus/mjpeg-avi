@@ -371,9 +371,7 @@ output_AVI_file(FILE * file_ptr, char * id, char * resolution, char * location, 
 	fputc('P',file_ptr); 
 	fputc('G',file_ptr); 
 
-	// trying this solution from: http://www.wischik.com/lu/programmer/avi_utils.html
 	strf.biSizeImage = ((strf.biWidth*strf.biBitCount/8 + 3)&0xFFFFFFFC)*strf.biHeight;
-//	strf.biSizeImage = len;
 	fwrite_DWORD(file_ptr, strf.biSizeImage);
 	strf.biXPelsPerMeter = 0;
 	fwrite_DWORD(file_ptr, strf.biXPelsPerMeter);
