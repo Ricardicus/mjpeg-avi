@@ -8,8 +8,12 @@ Change executable permissions of the script 'create-avi.sh' and compile the C so
 Run the script 'create-avi.sh' as follows:
 ./create-avi.sh <path where the jpgs reside> <widthxheight of the jpgs> <the number of jpgs> 
 #Example
-type the following commands: \n
-cd <this-directory> \n
-make \n
-chmod ugo+x create-avi.sh \n
+type the following commands:
+
+cd <this-directory>
+
+make 
+
+chmod ugo+x create-avi.sh 
+
 ./create-avi.sh jpgs 1080x720 1
