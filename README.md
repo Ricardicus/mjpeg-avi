@@ -8,9 +8,10 @@ Change executable permissions of the script 'create-avi.sh' and compile the C so
 Run the script 'create-avi.sh' as follows:
 ./create-avi.sh <path where the jpgs reside> <widthxheight of the jpgs> <the number of jpgs> 
 #Example
+Take a couple of photos and place them in a directory called 'jpgs'. 
 type the following commands:
 
-cd <this-directory>
+cd 'this-director'
 
 make 
 
