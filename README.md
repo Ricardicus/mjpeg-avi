@@ -1,4 +1,4 @@
-#Time lapse this
+#What is this?
 This is a program that can convert a bunch of jpgs to AVI format. 
 You can specify at what rate the jpgs can show up.
 #To make it work
