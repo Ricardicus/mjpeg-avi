@@ -6,7 +6,7 @@ You need JPG images of the same width and height.
 Place them in a directory.
 Change executable permissions of the script 'create-avi.sh' and compile the C source files.
 Run the script 'create-avi.sh' as follows:
-./create-avi.sh <path where the jpgs reside> <widthxheight of the jpgs> <the number of jpgs> 
+./create-avi.sh path/to/jpgs widthxheight [fps - optional]
 #Example
 Take a couple of photos and place them in a directory called for example 'jpgs'. 
 Check their dimensions, let's say 1080 pixels in width and 720 pixels in height. 
