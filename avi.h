@@ -145,18 +145,6 @@ typedef struct {
 	CHUNK movi_data;
 } avi_file;
 
-/* IDEA:
-*
-* make:		RIFF 'AVI '
-*			LIST hdrl
-- avih
-- LIST strl
-- strh
-- strf
-LIST movi
-*/
-
-
 void output_AVI_file(FILE *, char*, char *, char*, unsigned long, unsigned long);
 
 void output_every_jpg_in(FILE *, char*, char*, unsigned long);
