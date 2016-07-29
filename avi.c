@@ -96,8 +96,7 @@ output_every_jpg_correctly(FILE * file_ptr, char * location, char * id, unsigned
 		fputc('0',file_ptr); 
 		fputc('d',file_ptr); 
 		fputc('b',file_ptr);
-		// not sure: fred has: 17972 
-		// NOTE: Every JPG should have this one
+
 		data.dwSize = len;
 		fwrite_DWORD(file_ptr, data.dwSize);
 
@@ -330,7 +329,6 @@ output_AVI_file(FILE * file_ptr, char * id, char * resolution, char * location, 
 	strh.dwLength = nbr_of_jpgs; // +4 = 36
 	fwrite_DWORD(file_ptr, strh.dwLength);
 
-	// used to be 4990, fred has 26942
 	strh.dwSuggestedBufferSize = 0; // +4 = 40
 	fwrite_DWORD(file_ptr, strh.dwSuggestedBufferSize);
 	strh.dwQuality = 0; // +4 = 44
@@ -373,10 +371,7 @@ output_AVI_file(FILE * file_ptr, char * id, char * resolution, char * location, 
 	fputc('P',file_ptr); 
 	fputc('G',file_ptr); 
 
-	// Not sure if this is right, used to be "len" but fred has: 230400
-	// trying this solution from: http://www.wischik.com/lu/programmer/avi_utils.html
 	strf.biSizeImage = ((strf.biWidth*strf.biBitCount/8 + 3)&0xFFFFFFFC)*strf.biHeight;
-//	strf.biSizeImage = len;
 	fwrite_DWORD(file_ptr, strf.biSizeImage);
 	strf.biXPelsPerMeter = 0;
 	fwrite_DWORD(file_ptr, strf.biXPelsPerMeter);
@@ -387,13 +382,11 @@ output_AVI_file(FILE * file_ptr, char * id, char * resolution, char * location, 
 	strf.biClrImportant = 0;
 	fwrite_DWORD(file_ptr, strf.biClrImportant);
 
-// Adding the ODML LIST with the dmlh header
-
 	fputc('L',file_ptr); 
 	fputc('I',file_ptr); 
 	fputc('S',file_ptr); 
 	fputc('T',file_ptr); 
-	// used to be 1, fred has 16
+
 	DWORD ddww = 16;
 	fwrite_DWORD(file_ptr, ddww);
 	fputc('o',file_ptr); 
