@@ -20,7 +20,7 @@ done
 mkdir $_dir
 
 count=1
-for file in $(ls $path_jpgs); do
+for file in $(ls $path_jpgs | sort -n); do
 	e=${file%*.jpeg}
 	f=${file%*.jpg}
 	if [ ! $e = $file ] || [ ! $f = $file ]; then

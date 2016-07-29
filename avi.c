@@ -464,7 +464,7 @@ main(int argc, char * argv[])
 		i++;
 	}
 
-	FILE * fp = fopen("TestAvi.avi", "w");
+	FILE * fp = fopen("Video.avi", "w");
 	output_AVI_file(fp, NULL, resolution, location, (unsigned long) atol(fps), (unsigned long) atol(nbrjpgs));
 
 	fclose(fp);
