@@ -72,7 +72,7 @@ get_all_sizes(char * location, unsigned long nbr_of_jpgs){
 void
 output_every_jpg_correctly(FILE * file_ptr, char * location, char * id, unsigned long nbr_of_jpgs){
 
-	chdir("jpgs");
+	chdir(location);
 
 	FILE * fp; char filename[128]; unsigned long count = 1;
 	for(;count<=nbr_of_jpgs;count++){

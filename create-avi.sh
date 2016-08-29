@@ -19,6 +19,7 @@ while [ -d $_dir ]; do
 done
 mkdir $_dir
 
+# making a directory containing the jpgs in directory 'path_jpgs' and naming them X.jpeg where X is an ascending number starting from 1. 
 count=1
 for file in $(ls $path_jpgs | sort -n); do
 	e=${file%*.jpeg}
@@ -30,7 +31,11 @@ for file in $(ls $path_jpgs | sort -n); do
 done
 
 # calling the program!
-./avimake -r $resolution_jpgs -l $_dir -n $((count-1)) -s $fps_jpgs
+if cd bin; then
+	./avimake -r $resolution_jpgs -l ../$_dir -n $((count-1)) -s $fps_jpgs
+	mv Video.avi ../Video.avi
+	cd ..
+fi
 
 # cleanup 
 if cd $_dir; then

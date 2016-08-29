@@ -1,4 +1,4 @@
 CC=gcc
 
-all: avi.h
-	$(CC) avi.c -o avimake
+all: src/avi.h
+	$(CC) src/avi.c -o bin/avimake
