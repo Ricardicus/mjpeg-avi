@@ -2,6 +2,11 @@
 # Should be called with the path to the jpgs to be converted as first argument
 # resolution of the jpgs as the second argument, optional fps as third
 
+if [ $# -le 1 ]; then
+	echo "usage: $0 path_to_jpgs resolution_of_jpgs [fps]"
+	exit 1
+fi
+
 path_jpgs=$1
 resolution_jpgs=$2
 fps_jpgs=10
