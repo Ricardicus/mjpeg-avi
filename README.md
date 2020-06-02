@@ -34,3 +34,6 @@ chmod ugo+x create-avi.sh
 ./create-avi.sh jpgs 800x600 1
 ```
 
+# Playing the video
+
+Quicktime is not budging. I recommend VLC, it accepts mjpeg-avi.
