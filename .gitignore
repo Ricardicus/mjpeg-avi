@@ -1,2 +1,5 @@
 # Where I place the binaries
 bin/*
+
+# Mac 
+.SD_Store
