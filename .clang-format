@@ -1,0 +1,20 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+AlignEscapedNewlines: Left
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterFunction: true
+  BeforeCatch: true
+  BeforeElse: true
+BreakStringLiterals: false
+ColumnLimit: 99
+MaxEmptyLinesToKeep: 2
+SortIncludes: false
+...
+
