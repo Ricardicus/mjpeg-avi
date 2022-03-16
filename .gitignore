@@ -1,5 +1,9 @@
 # Where I place the binaries
 bin/*
 
+# Buildfiles
+src/*.d
+src/*.o
+
 # Mac 
 .SD_Store

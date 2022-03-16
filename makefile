@@ -1,4 +1,26 @@
-CC=gcc
+CC := gcc
 
-all: src/avi.h
-	$(CC) src/avi.c -o bin/avimake
+SRCS := src/avi.c src/main.c
+OBJS := $(SRCS:.c=.o)
+RULES := $(OBJS:.o=.d)
+
+NO_WARNINGS := multichar
+FLAGS := $(addprefix -Wno-, $(NO_WARNINGS))
+
+OUTDIR := bin
+
+all: avimake
+
+-include $(RULES)
+
+%.d: %.c
+	@$(CC) -M -Isrc $< > $@
+
+%.o: %.c
+	$(CC) -c -o $@ $<  $(FLAGS)
+
+avimake: $(OBJS)
+	$(CC) -o $(OUTDIR)/$@ $^ $(FLAGS)
+
+clean:
+	rm -rf src/*.o src/*.d

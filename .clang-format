@@ -1,5 +1,4 @@
 ---
-Language: Cpp
 BasedOnStyle: LLVM
 AlignEscapedNewlines: Left
 AllowShortIfStatementsOnASingleLine: WithoutElse

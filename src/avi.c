@@ -71,8 +71,7 @@ unsigned long get_all_sizes(char *location, unsigned long nbr_of_jpgs)
   return sizes;
 }
 
-void output_every_jpg_correctly(FILE *file_ptr, char *location, char *id,
-                                unsigned long nbr_of_jpgs)
+void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_jpgs)
 {
 
   chdir("jpgs");
@@ -93,7 +92,6 @@ void output_every_jpg_correctly(FILE *file_ptr, char *location, char *id,
     fseek(fp, 0, SEEK_END);
     len = ftell(fp);
     fseek(fp, 0, SEEK_SET);
-
 
     CHUNK data;
     data.dwFourCC = '00db';
@@ -430,50 +428,5 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('v', file_ptr);
   fputc('i', file_ptr);
 
-  output_every_jpg_correctly(file_ptr, location, id, nbr_of_jpgs);
-}
-
-int main(int argc, char *argv[])
-{
-  char *resolution = "800x600";
-  char *location = "jpgs";
-  char *fps = "10";
-  char *nbrjpgs = "5";
-
-  int i = 0;
-  while (i < argc) {
-    if (argv[i][0] == '-') {
-      if (i + 1 >= argc) goto error;
-      switch (argv[i][1]) {
-      case 'r':
-        resolution = argv[i + 1];
-        break;
-      case 'l':
-        location = argv[i + 1];
-        break;
-      case 's':
-        fps = argv[i + 1];
-        break;
-      case 'n':
-        nbrjpgs = argv[i + 1];
-        break;
-      default:
-        break;
-      }
-    }
-    i++;
-  }
-
-  FILE *fp = fopen("Video.avi", "wb");
-  assert(fp != NULL);
-  output_AVI_file(fp, NULL, resolution, location, (unsigned long)atol(fps),
-                  (unsigned long)atol(nbrjpgs));
-
-  fclose(fp);
-
-  return EXIT_SUCCESS;
-
-error:
-  printf("Could not interpret message");
-  return EXIT_FAILURE;
+  output_every_jpg_correctly(file_ptr, id, nbr_of_jpgs);
 }
