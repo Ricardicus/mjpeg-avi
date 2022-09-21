@@ -199,7 +199,7 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
 
   // dwSize = magic number (don't ask me) + dataload + dataheaders (8 per jpeg) + idx frames ( 16
   // per jpeg )
-  RIFF_LIST.dwSize = 240 + len + 8 * nbr_of_jpgs + 16 * nbr_of_jpgs;
+  RIFF_LIST.dwSize = 256 + len + 8 * nbr_of_jpgs + 16 * nbr_of_jpgs;
   fwrite_DWORD(file_ptr, RIFF_LIST.dwSize);
 
   RIFF_LIST.dwFourCC = 'AVI ';
@@ -215,7 +215,7 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('I', file_ptr);
   fputc('S', file_ptr);
   fputc('T', file_ptr);
-  hdrl.dwSize = 208;
+  hdrl.dwSize = 224;
   fwrite_DWORD(file_ptr, hdrl.dwSize);
   hdrl.dwFourCC = 'hdrl';
   fputc('h', file_ptr);
@@ -279,7 +279,7 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('I', file_ptr);
   fputc('S', file_ptr);
   fputc('T', file_ptr);
-  strl.dwSize = 132;
+  strl.dwSize = 148;
   fwrite_DWORD(file_ptr, strl.dwSize);
 
   strl.dwFourCC = 'strl';
@@ -295,7 +295,7 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('r', file_ptr);
   fputc('h', file_ptr);
 
-  strh.dwSize = 48;
+  strh.dwSize = 64;
   fwrite_DWORD(file_ptr, strh.dwSize);
   strh.fccType = 'vids';
   fputc('v', file_ptr);
@@ -340,6 +340,14 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   //
   strh.dwSampleSize = 0; // +4 = 48
   fwrite_DWORD(file_ptr, strh.dwSampleSize);
+  strh.rcFrame.left = 0;
+  fwrite_DWORD(file_ptr, strh.rcFrame.left);
+  strh.rcFrame.top = 0;
+  fwrite_DWORD(file_ptr, strh.rcFrame.top);
+  strh.rcFrame.right = jpgs_width;
+  fwrite_DWORD(file_ptr, strh.rcFrame.right);
+  strh.rcFrame.bottom  = jpgs_height;
+  fwrite_DWORD(file_ptr, strh.rcFrame.bottom);
 
   EXBMINFOHEADER strf;
 

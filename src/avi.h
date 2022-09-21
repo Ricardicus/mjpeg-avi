@@ -69,7 +69,7 @@ typedef struct {
   DWORD dwSuggestedBufferSize;
   DWORD dwQuality;
   DWORD dwSampleSize;
-
+  RECT rcFrame;
 } AVIStreamHeader;
 
 typedef struct {
