@@ -44,7 +44,7 @@ unsigned long get_all_sizes(char *location, unsigned long nbr_of_jpgs)
     unsigned long len;
     memset(filename, '\0', 128);
     sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "r");
+    fp = fopen(filename, "rb");
     if (!fp) {
       continue;
     }
@@ -74,7 +74,7 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     unsigned long len;
     memset(filename, '\0', 128);
     sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "r");
+    fp = fopen(filename, "rb");
     if (!fp) {
       continue;
     }
@@ -122,7 +122,7 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     unsigned long len;
     memset(filename, '\0', 128);
     sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "r");
+    fp = fopen(filename, "rb");
     if (!fp) {
       continue;
     }
@@ -157,7 +157,7 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
 
   FILE *fp;
 
-  fp = fopen("1.jpeg", "r");
+  fp = fopen("1.jpeg", "rb");
   assert(fp != NULL);
   fseek(fp, 0, SEEK_END);
   fclose(fp);
