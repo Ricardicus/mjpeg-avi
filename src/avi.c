@@ -41,41 +41,31 @@ unsigned long get_all_sizes(char *location, unsigned long nbr_of_jpgs)
   unsigned long count = 1;
   unsigned long sizes = 0;
   for (; count <= nbr_of_jpgs; count++) {
-
-    sprintf(filename, "echo \"get all sizes: nbrjpgs: %lu, count: %lu \" >> info.info",
-            nbr_of_jpgs, count);
-    system(filename);
-
     unsigned long len;
     memset(filename, '\0', 128);
     sprintf(filename, "%lu.jpeg", count);
     fp = fopen(filename, "r");
     if (!fp) {
-      system("echo \"could not open .jpeg\" > avigarage_error.info");
       continue;
     }
     fseek(fp, 0, SEEK_END);
     len = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    if (len % 2) len += 1;
+    if (len % 2) {
+      len += 1;
+    }
 
     sizes += len;
 
     fclose(fp);
   }
 
-  sprintf(filename, "echo \"returning size: %lu\" >> info.info", sizes);
-  system(filename);
-
   return sizes;
 }
 
 void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_jpgs)
 {
-
-  chdir("jpgs");
-
   FILE *fp;
   char filename[128];
   unsigned long count = 1;
@@ -86,7 +76,6 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     sprintf(filename, "%lu.jpeg", count);
     fp = fopen(filename, "r");
     if (!fp) {
-      system("echo \"could not open .jpeg\" > avigarage_error.info");
       continue;
     }
     fseek(fp, 0, SEEK_END);
@@ -98,9 +87,9 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     fputc('0', file_ptr);
     fputc('0', file_ptr);
     fputc('d', file_ptr);
-    fputc('b', file_ptr);
+    fputc('c', file_ptr);
 
-    data.dwSize = len;
+    data.dwSize = len + (len % 2 ? 1 : 0);
     fwrite_DWORD(file_ptr, data.dwSize);
 
     int c;
@@ -135,7 +124,6 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     sprintf(filename, "%lu.jpeg", count);
     fp = fopen(filename, "r");
     if (!fp) {
-      system("echo \"could not open .jpeg\" > avigarage_error.info");
       continue;
     }
     fseek(fp, 0, SEEK_END);
@@ -147,7 +135,7 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
     fputc('0', file_ptr);
     fputc('0', file_ptr);
     fputc('d', file_ptr);
-    fputc('b', file_ptr);
+    fputc('c', file_ptr);
     fwrite_DWORD(file_ptr, AVI_KEYFRAME);
     fwrite_DWORD(file_ptr, offset_count);
     fwrite_DWORD(file_ptr, len);
@@ -209,7 +197,9 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('F', file_ptr);
   fputc('F', file_ptr);
 
-  RIFF_LIST.dwSize = 150 + 12 + len + 8 * nbr_of_jpgs + 8 + 4 * 4 * nbr_of_jpgs;
+  // dwSize = magic number (don't ask me) + dataload + dataheaders (8 per jpeg) + idx frames ( 16
+  // per jpeg )
+  RIFF_LIST.dwSize = 240 + len + 8 * nbr_of_jpgs + 16 * nbr_of_jpgs;
   fwrite_DWORD(file_ptr, RIFF_LIST.dwSize);
 
   RIFF_LIST.dwFourCC = 'AVI ';
