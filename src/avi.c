@@ -6,9 +6,28 @@
 #include "avi.h"
 // AVI atoms
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define AVIIF_KEYFRAME 0x00000010
 // Tried to output directly through fputc ms ,file_ptr Will instead store header in file and then
 // read and output it
+
+FILE *_ffopen(const char *location, int image)
+{
+  char path[256];
+  memset(path, '\0', sizeof(path));
+  snprintf(path, sizeof(path), "%s/%d.jpg", location, image);
+  FILE *fp = fopen(path, "r");
+  if (fp == NULL) {
+    // Attempt to open as jpeg
+    memset(path, '\0', sizeof(path));
+    snprintf(path, sizeof(path), "%s/%d.jpeg", location, image);
+    fp = fopen(path, "r");
+  }
+  return fp;
+}
 
 void fwrite_DWORD(FILE *file_ptr, DWORD word)
 {
@@ -32,19 +51,14 @@ void fwrite_WORD(FILE *file_ptr, WORD word)
   }
 }
 
-unsigned long get_all_sizes(char *location, unsigned long nbr_of_jpgs)
+unsigned long get_all_sizes(const char *location, unsigned long nbr_of_jpgs)
 {
-  chdir(location);
-
   FILE *fp;
-  char filename[128];
   unsigned long count = 1;
   unsigned long sizes = 0;
   for (; count <= nbr_of_jpgs; count++) {
     unsigned long len;
-    memset(filename, '\0', 128);
-    sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "rb");
+    fp = _ffopen(location, count);
     if (!fp) {
       continue;
     }
@@ -64,17 +78,13 @@ unsigned long get_all_sizes(char *location, unsigned long nbr_of_jpgs)
   return sizes;
 }
 
-void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_jpgs)
+void output_every_jpg_correctly(FILE *file_ptr, const char *location, unsigned long nbr_of_jpgs)
 {
   FILE *fp;
-  char filename[128];
   unsigned long count = 1;
   for (; count <= nbr_of_jpgs; count++) {
-
     unsigned long len;
-    memset(filename, '\0', 128);
-    sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "rb");
+    fp = _ffopen(location, count);
     if (!fp) {
       continue;
     }
@@ -118,11 +128,8 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
   unsigned long offset_count = 4;
 
   for (; count <= nbr_of_jpgs; count++) {
-
     unsigned long len;
-    memset(filename, '\0', 128);
-    sprintf(filename, "%lu.jpeg", count);
-    fp = fopen(filename, "rb");
+    fp = _ffopen(location, count);
     if (!fp) {
       continue;
     }
@@ -143,53 +150,49 @@ void output_every_jpg_correctly(FILE *file_ptr, char *id, unsigned long nbr_of_j
   }
 }
 
-
-void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location, unsigned long fps,
-                     unsigned long nbr_of_jpgs)
+void _write_AVI_RIFF_header(FILE *file_ptr, DWORD len, unsigned long jpgs_width,
+                            unsigned long jpgs_height, int fps, unsigned long nbr_of_jpgs,
+                            int update_len_fields)
 {
-
-  // I need to know the nbr of jpg files, 'nbr_of_jpgs', and their respective
-  // size in bytes to be able to construct this AVI file
-  char path[128];
-  memset(path, '\0', 128);
-  sprintf(path, "%s", location);
-  chdir(path);
-
-  FILE *fp;
-
-  fp = fopen("1.jpeg", "rb");
-  assert(fp != NULL);
-  fseek(fp, 0, SEEK_END);
-  fclose(fp);
-
-  // Size found!
-
-  // I also need the width and the height of the jpgs.
-  // These will be stored in the variables 'jpgs_width' and 'jpgs_height'
-
-  DWORD jpgs_width;
-  DWORD jpgs_height;
-
-  char jpg_resolution[20];
-  memset(jpg_resolution, '\0', 20);
-  strcpy(jpg_resolution, resolution);
-
-  char *cptr;
-  cptr = jpg_resolution;
-
-  // .. resolution is given on the form [width]x[height]
-  while (*cptr != 'x') {
-    cptr++;
-  }
-  *cptr = '\0';
-  cptr++;
-
-  jpgs_width = (unsigned long)atol(jpg_resolution);
-  jpgs_height = (unsigned long)atol(cptr);
-
-  DWORD len = get_all_sizes(location, nbr_of_jpgs);
-
   RIFF RIFF_LIST;
+  LIST hdrl;
+  MainAVIHeader avih;
+  LIST strl;
+  AVIStreamHeader strh;
+  EXBMINFOHEADER strf;
+  LIST movi;
+
+  if (update_len_fields) {
+    if (fseek(file_ptr, 4, SEEK_SET) != 0) {
+      return;
+    }
+    RIFF_LIST.dwSize = 256 + len + 8 * nbr_of_jpgs + 16 * nbr_of_jpgs;
+    fwrite_DWORD(file_ptr, RIFF_LIST.dwSize);
+    if (fseek(file_ptr, 48, SEEK_SET) != 0) {
+      return;
+    }
+    avih.dwTotalFrames = nbr_of_jpgs;
+    fwrite_DWORD(file_ptr, avih.dwTotalFrames);
+    if (fseek(file_ptr, 140, SEEK_SET) != 0) {
+      return;
+    }
+    strh.dwLength = nbr_of_jpgs; // +4 = 36
+    fwrite_DWORD(file_ptr, strh.dwLength);
+    if (fseek(file_ptr, 240, SEEK_SET) != 0) {
+      return;
+    }
+    DWORD totalframes = nbr_of_jpgs;
+    fwrite_DWORD(file_ptr, totalframes);
+    if (fseek(file_ptr, 248, SEEK_SET) != 0) {
+      return;
+    }
+    movi.dwSize = len + 4 + 8 * nbr_of_jpgs;
+    fwrite_DWORD(file_ptr, movi.dwSize);
+    if (fseek(file_ptr, 0, SEEK_END) != 0) {
+      return;
+    }
+    return;
+  }
 
   RIFF_LIST.dwRIFF = 'RIFF';
   fputc('R', file_ptr);
@@ -209,7 +212,6 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc(' ', file_ptr);
   // 	RIFF_LIST.data = WAIT WITH THIS
 
-  LIST hdrl;
   hdrl.dwList = 'LIST';
   fputc('L', file_ptr);
   fputc('I', file_ptr);
@@ -222,8 +224,6 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('d', file_ptr);
   fputc('r', file_ptr);
   fputc('l', file_ptr);
-
-  MainAVIHeader avih;
 
   avih.dwFourCC = 'avih';
   fputc('a', file_ptr);
@@ -273,7 +273,6 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   avih.dwReserved[3] = 0;
   fwrite_DWORD(file_ptr, avih.dwReserved[3]);
 
-  LIST strl;
   strl.dwList = 'LIST';
   fputc('L', file_ptr);
   fputc('I', file_ptr);
@@ -288,7 +287,6 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('r', file_ptr);
   fputc('l', file_ptr);
 
-  AVIStreamHeader strh;
   strh.dwFourCC = 'strh';
   fputc('s', file_ptr);
   fputc('t', file_ptr);
@@ -346,10 +344,8 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fwrite_DWORD(file_ptr, strh.rcFrame.top);
   strh.rcFrame.right = jpgs_width;
   fwrite_DWORD(file_ptr, strh.rcFrame.right);
-  strh.rcFrame.bottom  = jpgs_height;
+  strh.rcFrame.bottom = jpgs_height;
   fwrite_DWORD(file_ptr, strh.rcFrame.bottom);
-
-  EXBMINFOHEADER strf;
 
   strf.dwFourCC = 'strf';
   fputc('s', file_ptr);
@@ -411,7 +407,6 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   DWORD totalframes = nbr_of_jpgs;
   fwrite_DWORD(file_ptr, totalframes);
 
-  LIST movi;
   movi.dwList = 'LIST';
   fputc('L', file_ptr);
   fputc('I', file_ptr);
@@ -425,6 +420,199 @@ void output_AVI_file(FILE *file_ptr, char *id, char *resolution, char *location,
   fputc('o', file_ptr);
   fputc('v', file_ptr);
   fputc('i', file_ptr);
-
-  output_every_jpg_correctly(file_ptr, id, nbr_of_jpgs);
 }
+
+void output_AVI_file(FILE *file_ptr, const char *resolution, const char *location,
+                     unsigned long fps, unsigned long nbr_of_jpgs)
+{
+  // I need to know the nbr of jpg files, 'nbr_of_jpgs', and their respective
+  // size in bytes to be able to construct this AVI file
+  FILE *fp;
+
+  fp = _ffopen(location, 1);
+  assert(fp != NULL);
+  fseek(fp, 0, SEEK_END);
+  fclose(fp);
+
+  // Size found!
+
+  // I also need the width and the height of the jpgs.
+  // These will be stored in the variables 'jpgs_width' and 'jpgs_height'
+
+  DWORD jpgs_width;
+  DWORD jpgs_height;
+
+  char jpg_resolution[20];
+  memset(jpg_resolution, '\0', 20);
+  strcpy(jpg_resolution, resolution);
+
+  char *cptr;
+  cptr = jpg_resolution;
+
+  // .. resolution is given on the form [width]x[height]
+  while (*cptr != 'x') {
+    cptr++;
+  }
+  *cptr = '\0';
+  cptr++;
+
+  jpgs_width = (unsigned long)atol(jpg_resolution);
+  jpgs_height = (unsigned long)atol(cptr);
+
+  DWORD len = get_all_sizes(location, nbr_of_jpgs);
+
+  _write_AVI_RIFF_header(file_ptr, len, jpgs_width, jpgs_height, fps, nbr_of_jpgs, 0);
+
+  output_every_jpg_correctly(file_ptr, location, nbr_of_jpgs);
+}
+
+
+avi_file_stream_t *avi_file_stream_new(const char *filename, const char *resolution,
+                                       const char *location, unsigned long fps)
+{
+  char resolutionBuf[20];
+  char filenameBufTmp[256];
+  DWORD len;
+  char *cptr;
+  avi_file_stream_t *stream = (avi_file_stream_t *)malloc(sizeof(avi_file_stream_t));
+  if (stream == NULL) {
+    return NULL;
+  }
+  stream->nbr_jpgs = 0;
+  stream->filename = calloc(strlen(filename) + 1, sizeof(char));
+  if (stream->filename == NULL) {
+    free(stream);
+    return NULL;
+  }
+  snprintf(stream->filename, strlen(filename) + 1, "%s", filename);
+  snprintf(filenameBufTmp, sizeof(filenameBufTmp), "%s.tmp", filename);
+  stream->raw_data_len = 0;
+  stream->fps = fps;
+  FILE *file_ptr = fopen(filenameBufTmp, "wb");
+  if (file_ptr == NULL) {
+    free(stream);
+    return NULL;
+  }
+  stream->file_ptr = file_ptr;
+  stream->indexer = NULL;
+  stream->last = NULL;
+  len = 0;
+
+  snprintf(resolutionBuf, sizeof(resolutionBuf), "%s", resolution);
+
+  cptr = resolutionBuf;
+  // .. resolution is given on the form [width]x[height]
+  while (*cptr != 'x') {
+    cptr++;
+  }
+  *cptr = '\0';
+  cptr++;
+
+  stream->jpgs_width = (unsigned long)atol(resolutionBuf);
+  stream->jpgs_height = (unsigned long)atol(cptr);
+
+  _write_AVI_RIFF_header(file_ptr, 0, stream->jpgs_width, stream->jpgs_height, fps, 0, 0);
+  return stream;
+}
+
+void avi_file_stream_free(avi_file_stream_t *stream)
+{
+  avi_file_idx_node_t *node = stream->indexer;
+  while (node != NULL) {
+    avi_file_idx_node_t *next = node->next;
+    free(node);
+    node = next;
+  }
+  free(stream->filename);
+  free(stream);
+}
+
+void avi_file_stream_write_jpg_data(avi_file_stream_t *stream, const char *data_buf,
+                                    size_t data_len)
+{
+  avi_file_idx_node_t *node = (avi_file_idx_node_t *)malloc(sizeof(avi_file_idx_node_t));
+  if (node == NULL) {
+    return;
+  }
+  unsigned long len = data_len;
+  FILE *file_ptr = stream->file_ptr;
+
+  CHUNK data;
+  data.dwFourCC = '00db';
+  fputc('0', file_ptr);
+  fputc('0', file_ptr);
+  fputc('d', file_ptr);
+  fputc('c', file_ptr);
+
+  data.dwSize = len + (len % 2 ? 1 : 0);
+  fwrite_DWORD(file_ptr, data.dwSize);
+
+  unsigned long i = 0;
+  while (i < len) {
+    int c = data_buf[i];
+    fputc(c, file_ptr);
+    i++;
+  }
+
+  if (len % 2) {
+    fputc('\0', file_ptr);
+  }
+
+  node->next = NULL;
+  node->len = data.dwSize;
+  if (stream->last == NULL) {
+    stream->indexer = node;
+    stream->last = node;
+  }
+  else {
+    stream->last->next = node;
+    stream->last = node;
+  }
+  stream->nbr_jpgs++;
+  stream->raw_data_len += node->len;
+  _write_AVI_RIFF_header(file_ptr, stream->raw_data_len, stream->jpgs_width, stream->jpgs_height,
+                         stream->fps, stream->nbr_jpgs, 1);
+}
+
+void avi_file_stream_finalize(avi_file_stream_t *stream)
+{
+  unsigned int count = 1;
+  char filenameBuf[256];
+  FILE *file_ptr = stream->file_ptr;
+  unsigned long nbr_of_jpgs = stream->nbr_jpgs;
+
+  snprintf(filenameBuf, sizeof(filenameBuf), "%s.tmp", stream->filename);
+
+  fputc('i', file_ptr);
+  fputc('d', file_ptr);
+  fputc('x', file_ptr);
+  fputc('1', file_ptr);
+  unsigned long index_length = 4 * 4 * nbr_of_jpgs;
+  fwrite_DWORD(file_ptr, index_length);
+
+  unsigned long AVI_KEYFRAME = 16;
+
+  unsigned long offset_count = 4;
+
+  avi_file_idx_node_t *node = stream->indexer;
+  while (node != NULL) {
+    unsigned long len = node->len;
+    node = node->next;
+    fputc('0', file_ptr);
+    fputc('0', file_ptr);
+    fputc('d', file_ptr);
+    fputc('c', file_ptr);
+    fwrite_DWORD(file_ptr, AVI_KEYFRAME);
+    fwrite_DWORD(file_ptr, offset_count);
+    fwrite_DWORD(file_ptr, len);
+    offset_count += len + 8;
+    count++;
+  }
+  fclose(file_ptr);
+  // move the file filenameBuf to stream->filename
+  rename(filenameBuf, stream->filename);
+}
+
+#ifdef __cplusplus
+}
+#endif

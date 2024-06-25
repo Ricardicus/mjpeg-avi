@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
   FILE *fp = fopen(out_file, "wb");
   assert(fp != NULL);
-  output_AVI_file(fp, NULL, resolution, location, (unsigned long)atol(fps),
+  output_AVI_file(fp, resolution, location, (unsigned long)atol(fps),
                   (unsigned long)atol(nbrjpgs));
   fseek(fp, 0, SEEK_END);
   len = ftell(fp);

@@ -20,6 +20,7 @@ all: avimake
 	$(CC) -c -o $@ $<  $(FLAGS)
 
 avimake: $(OBJS)
+	@mkdir -p $(OUTDIR)
 	$(CC) -o $(OUTDIR)/$@ $^ $(FLAGS)
 
 clean:

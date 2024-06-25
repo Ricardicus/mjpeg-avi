@@ -6,4 +6,7 @@ src/*.d
 src/*.o
 
 # Mac 
-.SD_Store
+.DS_Store
+
+# The videofile
+Video.avi
