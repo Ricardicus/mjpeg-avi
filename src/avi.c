@@ -468,7 +468,7 @@ void output_AVI_file(FILE *file_ptr, const char *resolution, const char *locatio
 
 
 avi_file_stream_t *avi_file_stream_new(const char *filename, const char *resolution,
-                                       const char *location, unsigned long fps)
+                                       unsigned long fps)
 {
   char resolutionBuf[20];
   char filenameBufTmp[256];

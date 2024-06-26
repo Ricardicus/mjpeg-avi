@@ -10,3 +10,6 @@ src/*.o
 
 # The videofile
 Video.avi
+
+# typical cmake build directory
+build
