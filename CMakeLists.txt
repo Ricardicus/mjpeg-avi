@@ -16,25 +16,25 @@ set(LIB_SOURCES "${SOURCE_DIR}/avi.c")
 set(EXE_SOURCES "${SOURCE_DIR}/main.c")
 
 # Define the shared library
-add_library(avi SHARED ${LIB_SOURCES})
+add_library(mjpegavi SHARED ${LIB_SOURCES})
 
 # Create the main program executable
 add_executable(avimake ${EXE_SOURCES})
 
-target_compile_options(avi PRIVATE -Wno-multichar)
+target_compile_options(mjpegavi PRIVATE -Wno-multichar)
 
 # Link the executable to the library
-target_link_libraries(avimake PRIVATE avi)
+target_link_libraries(avimake PRIVATE mjpegavi)
 
 # Include header files location
-target_include_directories(avi PUBLIC
+target_include_directories(avimake PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
 
 # Set install rules for the executable
 install(TARGETS avimake
         RUNTIME DESTINATION bin)
-install(TARGETS avi
+install(TARGETS mjpegavi
         RUNTIME DESTINATION lib)
 install(FILES "${SOURCE_DIR}/avi.h"
         DESTINATION include)
