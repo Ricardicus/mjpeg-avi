@@ -30,6 +30,10 @@ target_link_libraries(avimake PRIVATE mjpegavi)
 target_include_directories(avimake PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
+# Include header files location
+target_include_directories(mjpegavi PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include>)
 
 # Set install rules for the executable
 install(TARGETS avimake
